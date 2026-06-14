@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import com.metroai.metroai_backend.auth.dto.LoginRequest;
 import com.metroai.metroai_backend.auth.dto.LoginResponse;
 import com.metroai.metroai_backend.auth.dto.RegisterRequest;
+import com.metroai.metroai_backend.auth.dto.UserProfileResponse;
 import com.metroai.metroai_backend.auth.entity.Role;
 import com.metroai.metroai_backend.auth.entity.User;
 import com.metroai.metroai_backend.auth.jwt.JwtService;
 import com.metroai.metroai_backend.auth.repository.UserRepository;
-
 
 @Service
 public class AuthService {
@@ -79,5 +79,27 @@ public class AuthService {
 );
 
 return new LoginResponse(token);
+}
+
+public UserProfileResponse getCurrentUser(
+        String token
+) {
+
+    String email =
+            jwtService.extractEmail(token);
+
+    User user =
+            userRepository
+                    .findByEmail(email)
+                    .orElseThrow(
+                            () -> new RuntimeException(
+                                    "User not found"
+                            )
+                    );
+
+    return new UserProfileResponse(
+            user.getEmail(),
+            user.getRole().name()
+    );
 }
 }
