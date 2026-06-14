@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.metroai.metroai_backend.exception.DuplicateResourceException;
 import com.metroai.metroai_backend.exception.ResourceNotFoundException;
+import com.metroai.metroai_backend.line.entity.Line;
+import com.metroai.metroai_backend.line.repository.LineRepository;
 import com.metroai.metroai_backend.station.dto.CreateStationRequest;
 import com.metroai.metroai_backend.station.dto.StationResponse;
 import com.metroai.metroai_backend.station.entity.Station;
@@ -19,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class StationService {
 
     private final StationRepository stationRepository;
-
+    private final LineRepository lineRepository;
     public StationResponse createStation(
         CreateStationRequest request
 ) {
@@ -33,10 +35,20 @@ public class StationService {
 );
     }
 
+Line line =
+        lineRepository
+                .findById(
+                        request.lineId()
+                )
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Line not found"
+                        )
+                );
     Station station = Station.builder()
             .name(request.name())
             .code(request.code())
-            .line(request.line())
+            .line(line)
             .latitude(request.latitude())
             .longitude(request.longitude())
             .isInterchange(request.isInterchange())
@@ -49,7 +61,8 @@ public class StationService {
             savedStation.getId(),
             savedStation.getName(),
             savedStation.getCode(),
-            savedStation.getLine(),
+            savedStation.getLine().getName(),
+            savedStation.getLine().getCode(),
             savedStation.getLatitude(),
             savedStation.getLongitude(),
             savedStation.getIsInterchange()
@@ -61,14 +74,15 @@ public List<StationResponse> getAllStations() {
     return stationRepository.findAll()
             .stream()
             .map(station -> new StationResponse(
-                    station.getId(),
-                    station.getName(),
-                    station.getCode(),
-                    station.getLine(),
-                    station.getLatitude(),
-                    station.getLongitude(),
-                    station.getIsInterchange()
-            ))
+            station.getId(),
+            station.getName(),
+            station.getCode(),
+            station.getLine().getName(),
+            station.getLine().getCode(),
+            station.getLatitude(),
+            station.getLongitude(),
+            station.getIsInterchange()
+))
             .toList();
 }
 
@@ -89,7 +103,8 @@ public StationResponse getStationById(
             station.getId(),
             station.getName(),
             station.getCode(),
-            station.getLine(),
+            station.getLine().getName(),
+            station.getLine().getCode(),
             station.getLatitude(),
             station.getLongitude(),
             station.getIsInterchange()
@@ -105,14 +120,15 @@ public List<StationResponse> searchStations(
             .findByNameContainingIgnoreCase(name)
             .stream()
             .map(station -> new StationResponse(
-                    station.getId(),
-                    station.getName(),
-                    station.getCode(),
-                    station.getLine(),
-                    station.getLatitude(),
-                    station.getLongitude(),
-                    station.getIsInterchange()
-            ))
+             station.getId(),
+             station.getName(),
+             station.getCode(),
+             station.getLine().getName(),
+             station.getLine().getCode(),
+             station.getLatitude(),
+             station.getLongitude(),
+             station.getIsInterchange()
+))
             .toList();
 }
 
@@ -129,10 +145,17 @@ public StationResponse updateStation(
                                     "Station not found"
                             )
                     );
-
+Line line =
+        lineRepository
+                .findById(request.lineId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Line not found"
+                        )
+                );
     station.setName(request.name());
     station.setCode(request.code());
-    station.setLine(request.line());
+    station.setLine(line);
     station.setLatitude(request.latitude());
     station.setLongitude(request.longitude());
     station.setIsInterchange(
@@ -146,7 +169,8 @@ public StationResponse updateStation(
             updatedStation.getId(),
             updatedStation.getName(),
             updatedStation.getCode(),
-            updatedStation.getLine(),
+            updatedStation.getLine().getName(),
+            updatedStation.getLine().getCode(),
             updatedStation.getLatitude(),
             updatedStation.getLongitude(),
             updatedStation.getIsInterchange()
