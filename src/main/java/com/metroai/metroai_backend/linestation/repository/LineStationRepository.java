@@ -28,4 +28,11 @@ findFirstByStationId(
         Long stationId
 );
 
+List<LineStation>
+findByLineIdAndStationOrderBetweenOrderByStationOrderAsc(
+        Long lineId,
+        Integer startOrder,
+        Integer endOrder
+);
+
 }

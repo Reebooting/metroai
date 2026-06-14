@@ -2,7 +2,7 @@ package com.metroai.metroai_backend.journey.dto;
 
 import java.util.List;
 
-public record JourneyResponse(
+public record RouteResponse(
 
         String source,
 
