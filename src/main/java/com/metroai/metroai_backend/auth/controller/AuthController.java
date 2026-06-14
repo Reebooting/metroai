@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.metroai.metroai_backend.auth.dto.LoginRequest;
+import com.metroai.metroai_backend.auth.dto.LoginResponse;
 import com.metroai.metroai_backend.auth.dto.RegisterRequest;
 import com.metroai.metroai_backend.auth.service.AuthService;
 
@@ -26,4 +28,11 @@ public class AuthController {
     ) {
         return authService.register(request);
     }
+
+    @PostMapping("/login")
+    public LoginResponse login(
+           @Valid @RequestBody LoginRequest request
+) {
+    return authService.login(request);
+}
 }

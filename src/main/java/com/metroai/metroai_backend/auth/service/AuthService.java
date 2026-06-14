@@ -5,20 +5,30 @@ import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.metroai.metroai_backend.auth.dto.LoginRequest;
+import com.metroai.metroai_backend.auth.dto.LoginResponse;
 import com.metroai.metroai_backend.auth.dto.RegisterRequest;
 import com.metroai.metroai_backend.auth.entity.Role;
 import com.metroai.metroai_backend.auth.entity.User;
+import com.metroai.metroai_backend.auth.jwt.JwtService;
 import com.metroai.metroai_backend.auth.repository.UserRepository;
+
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public AuthService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
+    private final JwtService jwtService;
+  
+   public AuthService(
+        UserRepository userRepository,
+        PasswordEncoder passwordEncoder,
+        JwtService jwtService
+) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.jwtService = jwtService;
 }
 
     public String register(RegisterRequest request) {
@@ -40,4 +50,34 @@ public class AuthService {
 
         return "User registered successfully";
     }
+
+    public LoginResponse login(LoginRequest request) {
+
+    User user = userRepository
+            .findByEmail(request.email())
+            .orElseThrow(
+                    () -> new RuntimeException(
+                            "Invalid email or password"
+                    )
+            );
+
+    boolean validPassword =
+            passwordEncoder.matches(
+                    request.password(),
+                    user.getPassword()
+            );
+
+    if (!validPassword) {
+        throw new RuntimeException(
+                "Invalid email or password"
+        );
+    }
+
+    String token = jwtService.generateToken(
+        user.getEmail(),
+        user.getRole().name()
+);
+
+return new LoginResponse(token);
+}
 }
