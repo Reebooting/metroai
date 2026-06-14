@@ -23,4 +23,9 @@ Optional<LineStation>findByLineIdAndStationId(
         Long stationId
 );
 
+Optional<LineStation>
+findFirstByStationId(
+        Long stationId
+);
+
 }

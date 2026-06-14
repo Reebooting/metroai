@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.metroai.metroai_backend.station.dto.CreateStationRequest;
+import com.metroai.metroai_backend.station.dto.StationDetailsResponse;
 import com.metroai.metroai_backend.station.dto.StationResponse;
 import com.metroai.metroai_backend.station.service.StationService;
 
@@ -85,6 +86,16 @@ public void deleteStation(
 ) {
 
     stationService.deleteStation(
+            id
+    );
+}
+
+@GetMapping("/{id}/details")
+public StationDetailsResponse getStationDetails(
+        @PathVariable Long id
+) {
+
+    return stationService.getStationDetails(
             id
     );
 }

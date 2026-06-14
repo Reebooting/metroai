@@ -9,7 +9,10 @@ import com.metroai.metroai_backend.exception.DuplicateResourceException;
 import com.metroai.metroai_backend.exception.ResourceNotFoundException;
 import com.metroai.metroai_backend.line.entity.Line;
 import com.metroai.metroai_backend.line.repository.LineRepository;
+import com.metroai.metroai_backend.linestation.entity.LineStation;
+import com.metroai.metroai_backend.linestation.repository.LineStationRepository;
 import com.metroai.metroai_backend.station.dto.CreateStationRequest;
+import com.metroai.metroai_backend.station.dto.StationDetailsResponse;
 import com.metroai.metroai_backend.station.dto.StationResponse;
 import com.metroai.metroai_backend.station.entity.Station;
 import com.metroai.metroai_backend.station.repository.StationRepository;
@@ -22,6 +25,7 @@ public class StationService {
 
     private final StationRepository stationRepository;
     private final LineRepository lineRepository;
+    private final LineStationRepository lineStationRepository;
     public StationResponse createStation(
         CreateStationRequest request
 ) {
@@ -192,6 +196,42 @@ public void deleteStation(
 
     stationRepository.delete(
             station
+    );
+}
+
+public StationDetailsResponse getStationDetails(
+        Long id
+) {
+
+    Station station =
+            stationRepository
+                    .findById(id)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(
+                                    "Station not found"
+                            )
+                    );
+
+    LineStation lineStation =
+            lineStationRepository
+                    .findFirstByStationId(id)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(
+                                    "Station not assigned to line"
+                            )
+                    );
+
+    return new StationDetailsResponse(
+            station.getId(),
+            station.getName(),
+            station.getCode(),
+            station.getLine().getName(),
+            station.getLine().getCode(),
+            lineStation.getStationOrder(),
+            lineStation.getDistanceFromStart(),
+            station.getLatitude(),
+            station.getLongitude(),
+            station.getIsInterchange()
     );
 }
 
