@@ -35,4 +35,6 @@ findByLineIdAndStationOrderBetweenOrderByStationOrderAsc(
         Integer endOrder
 );
 
+List<LineStation> findAllByOrderByLineIdAscStationOrderAsc();
+
 }
