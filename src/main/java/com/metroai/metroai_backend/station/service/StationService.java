@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class StationService {
 
     private final StationRepository stationRepository;
-    private final LineRepository lineRepository;
     private final LineStationRepository lineStationRepository;
     public StationResponse createStation(
         CreateStationRequest request
@@ -39,20 +38,9 @@ public class StationService {
 );
     }
 
-Line line =
-        lineRepository
-                .findById(
-                        request.lineId()
-                )
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(
-                                "Line not found"
-                        )
-                );
     Station station = Station.builder()
             .name(request.name())
             .code(request.code())
-            .line(line)
             .latitude(request.latitude())
             .longitude(request.longitude())
             .isInterchange(request.isInterchange())
@@ -65,8 +53,6 @@ Line line =
             savedStation.getId(),
             savedStation.getName(),
             savedStation.getCode(),
-            savedStation.getLine().getName(),
-            savedStation.getLine().getCode(),
             savedStation.getLatitude(),
             savedStation.getLongitude(),
             savedStation.getIsInterchange()
@@ -81,13 +67,10 @@ public List<StationResponse> getAllStations() {
             station.getId(),
             station.getName(),
             station.getCode(),
-            station.getLine().getName(),
-            station.getLine().getCode(),
             station.getLatitude(),
             station.getLongitude(),
             station.getIsInterchange()
-))
-            .toList();
+)).toList();
 }
 
 public StationResponse getStationById(
@@ -107,8 +90,6 @@ public StationResponse getStationById(
             station.getId(),
             station.getName(),
             station.getCode(),
-            station.getLine().getName(),
-            station.getLine().getCode(),
             station.getLatitude(),
             station.getLongitude(),
             station.getIsInterchange()
@@ -127,8 +108,6 @@ public List<StationResponse> searchStations(
              station.getId(),
              station.getName(),
              station.getCode(),
-             station.getLine().getName(),
-             station.getLine().getCode(),
              station.getLatitude(),
              station.getLongitude(),
              station.getIsInterchange()
@@ -149,17 +128,9 @@ public StationResponse updateStation(
                                     "Station not found"
                             )
                     );
-Line line =
-        lineRepository
-                .findById(request.lineId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(
-                                "Line not found"
-                        )
-                );
+
     station.setName(request.name());
     station.setCode(request.code());
-    station.setLine(line);
     station.setLatitude(request.latitude());
     station.setLongitude(request.longitude());
     station.setIsInterchange(
@@ -173,8 +144,6 @@ Line line =
             updatedStation.getId(),
             updatedStation.getName(),
             updatedStation.getCode(),
-            updatedStation.getLine().getName(),
-            updatedStation.getLine().getCode(),
             updatedStation.getLatitude(),
             updatedStation.getLongitude(),
             updatedStation.getIsInterchange()
@@ -225,8 +194,6 @@ public StationDetailsResponse getStationDetails(
             station.getId(),
             station.getName(),
             station.getCode(),
-            station.getLine().getName(),
-            station.getLine().getCode(),
             lineStation.getStationOrder(),
             lineStation.getDistanceFromStart(),
             station.getLatitude(),

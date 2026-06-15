@@ -8,10 +8,6 @@ public record StationDetailsResponse(
 
         String code,
 
-        String lineName,
-
-        String lineCode,
-
         Integer stationOrder,
 
         Double distanceFromStart,

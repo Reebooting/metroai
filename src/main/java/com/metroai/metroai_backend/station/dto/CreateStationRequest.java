@@ -1,7 +1,6 @@
 package com.metroai.metroai_backend.station.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public record CreateStationRequest(
 
@@ -10,9 +9,6 @@ public record CreateStationRequest(
 
         @NotBlank
         String code,
-
-        @NotNull
-        Long lineId,
 
         Double latitude,
 

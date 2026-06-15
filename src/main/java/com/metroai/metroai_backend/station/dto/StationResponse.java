@@ -8,9 +8,6 @@ public record StationResponse(
 
         String code,
 
-        String lineName,
-        String lineCode,
-
         Double latitude,
 
         Double longitude,

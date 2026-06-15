@@ -37,4 +37,8 @@ findByLineIdAndStationOrderBetweenOrderByStationOrderAsc(
 
 List<LineStation> findAllByOrderByLineIdAscStationOrderAsc();
 
+List<LineStation> findByStationId(
+        Long stationId
+);
+
 }
