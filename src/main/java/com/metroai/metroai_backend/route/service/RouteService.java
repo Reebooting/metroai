@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.metroai.metroai_backend.exception.ResourceNotFoundException;
 import com.metroai.metroai_backend.graph.service.GraphService;
+import com.metroai.metroai_backend.linestation.entity.LineStation;
 import com.metroai.metroai_backend.linestation.repository.LineStationRepository;
 import com.metroai.metroai_backend.route.dto.RouteResponse;
 import com.metroai.metroai_backend.station.entity.Station;
@@ -64,18 +65,81 @@ public class RouteService {
 private int calculateInterchanges(
         List<Long> path
 ) {
+
+    if (path.size() < 2) {
+
+        return 0;
+    }
+
     int interchangeCount = 0;
 
-    for (Long stationId : path) {
+    Long previousLine =
+            findCommonLine(
+                    path.get(0),
+                    path.get(1)
+            );
 
-        int lineCount = lineStationRepository.findByStationId( stationId ).size();
+    for (
+            int i = 1;
+            i < path.size() - 1;
+            i++
+    ) {
 
-        if (lineCount > 1) {
+        Long currentLine =
+                findCommonLine(
+                        path.get(i),
+                        path.get(i + 1)
+                );
+
+        if (
+                previousLine != null
+                &&
+                currentLine != null
+                &&
+                !previousLine.equals(
+                        currentLine
+                )
+        ) {
+
             interchangeCount++;
         }
+
+        previousLine = currentLine;
     }
 
     return interchangeCount;
+}
+
+private Long findCommonLine(
+        Long stationA,
+        Long stationB
+) {
+
+    List<LineStation> first =
+            lineStationRepository
+                    .findByStationId(stationA);
+
+    List<LineStation> second =
+            lineStationRepository
+                    .findByStationId(stationB);
+
+    for (LineStation a : first) {
+
+        for (LineStation b : second) {
+
+            if (
+                a.getLine().getId()
+                 .equals(
+                    b.getLine().getId()
+                 )
+            ) {
+
+                return a.getLine().getId();
+            }
+        }
+    }
+
+    return null;
 }
 
 }
