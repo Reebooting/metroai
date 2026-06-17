@@ -7,11 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.metroai.metroai_backend.exception.DuplicateResourceException;
 import com.metroai.metroai_backend.exception.ResourceNotFoundException;
-import com.metroai.metroai_backend.line.entity.Line;
-import com.metroai.metroai_backend.line.repository.LineRepository;
 import com.metroai.metroai_backend.linestation.entity.LineStation;
 import com.metroai.metroai_backend.linestation.repository.LineStationRepository;
 import com.metroai.metroai_backend.station.dto.CreateStationRequest;
+import com.metroai.metroai_backend.station.dto.NearestStationResponse;
 import com.metroai.metroai_backend.station.dto.StationDetailsResponse;
 import com.metroai.metroai_backend.station.dto.StationResponse;
 import com.metroai.metroai_backend.station.entity.Station;
@@ -200,6 +199,111 @@ public StationDetailsResponse getStationDetails(
             station.getLongitude(),
             station.getIsInterchange()
     );
+}
+
+public NearestStationResponse findNearestStation(
+        Double latitude,
+        Double longitude
+) {
+
+    List<Station> stations =
+            stationRepository.findAll();
+
+    Station nearestStation = null;
+
+    double minimumDistance =
+            Double.MAX_VALUE;
+
+    for (Station station : stations) {
+
+        if (
+                station.getLatitude() == null
+                ||
+                station.getLongitude() == null
+        ) {
+            continue;
+        }
+
+        double distance =
+                calculateDistance(
+                        latitude,
+                        longitude,
+                        station.getLatitude(),
+                        station.getLongitude()
+                );
+
+        if (distance < minimumDistance) {
+
+            minimumDistance = distance;
+            nearestStation = station;
+        }
+    }
+
+    if (nearestStation == null) {
+
+        throw new ResourceNotFoundException(
+                "No stations found"
+        );
+    }
+
+    return new NearestStationResponse(
+            nearestStation.getId(),
+            nearestStation.getName(),
+            Math.round(
+                    minimumDistance * 100.0
+            ) / 100.0
+    );
+}
+
+private double calculateDistance(
+
+        double lat1,
+
+        double lon1,
+
+        double lat2,
+
+        double lon2
+
+) {
+
+    final double EARTH_RADIUS = 6371;
+
+    double dLat =
+            Math.toRadians(
+                    lat2 - lat1
+            );
+
+    double dLon =
+            Math.toRadians(
+                    lon2 - lon1
+            );
+
+    double a =
+            Math.sin(dLat / 2)
+                    * Math.sin(dLat / 2)
+                    +
+                    Math.cos(
+                            Math.toRadians(lat1)
+                    )
+                    *
+                    Math.cos(
+                            Math.toRadians(lat2)
+                    )
+                    *
+                    Math.sin(dLon / 2)
+                    *
+                    Math.sin(dLon / 2);
+
+    double c =
+            2
+                    *
+                    Math.atan2(
+                            Math.sqrt(a),
+                            Math.sqrt(1 - a)
+                    );
+
+    return EARTH_RADIUS * c;
 }
 
 }

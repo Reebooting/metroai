@@ -45,8 +45,7 @@ public UserProfileResponse getCurrentUser(
         String authHeader
 ) {
 
-    String token =
-            authHeader.substring(7);
+    String token = authHeader.substring(7);
 
     return authService.getCurrentUser(token);
 }

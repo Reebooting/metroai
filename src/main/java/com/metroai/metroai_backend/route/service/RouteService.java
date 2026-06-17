@@ -11,6 +11,7 @@ import com.metroai.metroai_backend.linestation.entity.LineStation;
 import com.metroai.metroai_backend.linestation.repository.LineStationRepository;
 import com.metroai.metroai_backend.route.dto.JourneyInstructionResponse;
 import com.metroai.metroai_backend.route.dto.RouteResponse;
+import com.metroai.metroai_backend.route.dto.RouteSegmentResponse;
 import com.metroai.metroai_backend.route.dto.RouteStationResponse;
 import com.metroai.metroai_backend.station.entity.Station;
 import com.metroai.metroai_backend.station.repository.StationRepository;
@@ -58,6 +59,8 @@ public class RouteService {
                 .toList();
 
         List<JourneyInstructionResponse> instructions = buildInstructions(path);
+        
+        List<RouteSegmentResponse> segments = buildSegments(path);
 
         int totalStations = path.size() - 1;
 
@@ -70,6 +73,7 @@ public class RouteService {
 
         int estimatedTimeMinutes = calculateTravelTime(totalDistanceKm,interchangeCount );
 
+        int fare =calculateFare( totalDistanceKm );
         
 
         return new RouteResponse(
@@ -81,8 +85,10 @@ public class RouteService {
                 totalDistanceKm,
                 estimatedTimeMinutes,
                 interchangeCount,
+                fare,
                 route,
-                instructions
+                instructions,
+                segments
         );
     }
 
@@ -361,6 +367,121 @@ private String getLineNameBetweenStations(
     }
 
     return "Unknown Line";
+}
+
+private List<RouteSegmentResponse>
+buildSegments(
+        List<Long> path
+) {
+
+    List<RouteSegmentResponse> segments =
+            new ArrayList<>();
+
+    if (path.size() < 2) {
+        return segments;
+    }
+
+    String currentLine =
+            getLineNameBetweenStations(
+                    path.get(0),
+                    path.get(1)
+            );
+
+    Long segmentStart =
+            path.get(0);
+
+    int stationCount = 0;
+
+    for (
+            int i = 0;
+            i < path.size() - 1;
+            i++
+    ) {
+
+        String line =
+                getLineNameBetweenStations(
+                        path.get(i),
+                        path.get(i + 1)
+                );
+
+        if (
+                !line.equals(currentLine)
+        ) {
+
+            Station from =
+                    stationRepository
+                            .findById(segmentStart)
+                            .orElseThrow();
+
+            Station to =
+                    stationRepository
+                            .findById(path.get(i))
+                            .orElseThrow();
+
+            segments.add(
+                    new RouteSegmentResponse(
+                            currentLine,
+                            from.getName(),
+                            to.getName(),
+                            stationCount
+                    )
+            );
+
+            currentLine = line;
+            segmentStart = path.get(i);
+            stationCount = 1;
+
+        } else {
+
+            stationCount++;
+        }
+    }
+
+    Station from =
+            stationRepository
+                    .findById(segmentStart)
+                    .orElseThrow();
+
+    Station to =
+            stationRepository
+                    .findById(
+                            path.get(path.size() - 1)
+                    )
+                    .orElseThrow();
+
+    segments.add(
+            new RouteSegmentResponse(
+                    currentLine,
+                    from.getName(),
+                    to.getName(),
+                    stationCount
+            )
+    );
+
+    return segments;
+}
+
+private int calculateFare(
+        double distanceKm
+) {
+
+    if (distanceKm <= 2) {
+        return 10;
+    }
+
+    if (distanceKm <= 5) {
+        return 20;
+    }
+
+    if (distanceKm <= 12) {
+        return 30;
+    }
+
+    if (distanceKm <= 21) {
+        return 40;
+    }
+
+    return 50;
 }
 
 }

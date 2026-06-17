@@ -20,9 +20,14 @@ public record RouteResponse(
 
         Integer interchangeCount,
 
+        Integer fare,
+        
+
         List<RouteStationResponse> route,
 
-        List<JourneyInstructionResponse> instructions
+        List<JourneyInstructionResponse> instructions,
+
+        List<RouteSegmentResponse> segments
 
         
 

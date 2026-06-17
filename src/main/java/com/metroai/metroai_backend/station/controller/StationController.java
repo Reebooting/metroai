@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.metroai.metroai_backend.station.dto.CreateStationRequest;
+import com.metroai.metroai_backend.station.dto.NearestStationResponse;
 import com.metroai.metroai_backend.station.dto.StationDetailsResponse;
 import com.metroai.metroai_backend.station.dto.StationResponse;
 import com.metroai.metroai_backend.station.service.StationService;
@@ -53,6 +54,20 @@ public StationResponse getStationById(
 
     return stationService.getStationById(
             id
+    );
+}
+@GetMapping("/nearest")
+public NearestStationResponse nearestStation(
+
+        @RequestParam Double latitude,
+
+        @RequestParam Double longitude
+
+) {
+
+    return stationService.findNearestStation(
+            latitude,
+            longitude
     );
 }
 
