@@ -1,5 +1,6 @@
 package com.metroai.metroai_backend.route.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,7 +9,9 @@ import com.metroai.metroai_backend.exception.ResourceNotFoundException;
 import com.metroai.metroai_backend.graph.service.GraphService;
 import com.metroai.metroai_backend.linestation.entity.LineStation;
 import com.metroai.metroai_backend.linestation.repository.LineStationRepository;
+import com.metroai.metroai_backend.route.dto.JourneyInstructionResponse;
 import com.metroai.metroai_backend.route.dto.RouteResponse;
+import com.metroai.metroai_backend.route.dto.RouteStationResponse;
 import com.metroai.metroai_backend.station.entity.Station;
 import com.metroai.metroai_backend.station.repository.StationRepository;
 
@@ -35,11 +38,26 @@ public class RouteService {
                         .orElseThrow(
                                 () -> new ResourceNotFoundException("Destination station not found"));
 
-        List<Station> stations =
-        stationRepository.findAllById(path);
+        List<Station> stations = stationRepository.findAllById(path);
 
-        List<String> route = path.stream().map(id ->stations.stream()
-                     .filter(station ->station.getId().equals(id)).findFirst().orElseThrow().getName()).toList();
+        List<RouteStationResponse> route =
+        path.stream()
+                .map(id -> {
+
+                    Station station =
+                            stationRepository
+                                    .findById(id)
+                                    .orElseThrow();
+
+                    return new RouteStationResponse(
+                            station.getId(),
+                            station.getName(),
+                            station.getIsInterchange()
+                    );
+                })
+                .toList();
+
+        List<JourneyInstructionResponse> instructions = buildInstructions(path);
 
         int totalStations = path.size() - 1;
 
@@ -63,7 +81,8 @@ public class RouteService {
                 totalDistanceKm,
                 estimatedTimeMinutes,
                 interchangeCount,
-                route
+                route,
+                instructions
         );
     }
 
@@ -217,6 +236,131 @@ private int calculateTravelTime(
     return (int) Math.ceil(
             minutes
     ) + (interchangeCount * 5);
+}
+
+private List<JourneyInstructionResponse>
+buildInstructions(
+        List<Long> path
+) {
+
+    List<JourneyInstructionResponse> instructions =
+            new ArrayList<>();
+
+    if (path.size() < 2) {
+
+        return instructions;
+    }
+
+    int step = 1;
+
+    Station source =
+            stationRepository
+                    .findById(path.get(0))
+                    .orElseThrow();
+
+    String currentLine =
+            getLineNameBetweenStations(
+                    path.get(0),
+                    path.get(1)
+            );
+
+    instructions.add(
+            new JourneyInstructionResponse(
+                    step++,
+                    "Board "
+                            + currentLine
+                            + " at "
+                            + source.getName()
+            )
+    );
+
+    for (
+            int i = 1;
+            i < path.size() - 1;
+            i++
+    ) {
+
+        String nextLine =
+                getLineNameBetweenStations(
+                        path.get(i),
+                        path.get(i + 1)
+                );
+
+        if (
+                !currentLine.equals(
+                        nextLine
+                )
+        ) {
+
+            Station interchange =
+                    stationRepository
+                            .findById(path.get(i))
+                            .orElseThrow();
+
+            instructions.add(
+                    new JourneyInstructionResponse(
+                            step++,
+                            "Change from "
+                                    + currentLine
+                                    + " to "
+                                    + nextLine
+                                    + " at "
+                                    + interchange.getName()
+                    )
+            );
+
+            currentLine = nextLine;
+        }
+    }
+
+    Station destination =
+            stationRepository
+                    .findById(
+                            path.get(path.size() - 1)
+                    )
+                    .orElseThrow();
+
+    instructions.add(
+            new JourneyInstructionResponse(
+                    step,
+                    "Arrive at "
+                            + destination.getName()
+            )
+    );
+
+    return instructions;
+}
+
+private String getLineNameBetweenStations(
+        Long stationA,
+        Long stationB
+) {
+
+    List<LineStation> first =
+            lineStationRepository
+                    .findByStationId(stationA);
+
+    List<LineStation> second =
+            lineStationRepository
+                    .findByStationId(stationB);
+
+    for (LineStation a : first) {
+
+        for (LineStation b : second) {
+
+            if (
+                    a.getLine().getId()
+                            .equals(
+                                    b.getLine().getId()
+                            )
+            ) {
+
+                return a.getLine().getName();
+            }
+        }
+    }
+
+    return "Unknown Line";
 }
 
 }

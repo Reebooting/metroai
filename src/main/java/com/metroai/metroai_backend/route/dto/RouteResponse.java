@@ -20,7 +20,11 @@ public record RouteResponse(
 
         Integer interchangeCount,
 
-        List<String> route
+        List<RouteStationResponse> route,
+
+        List<JourneyInstructionResponse> instructions
+
+        
 
 ) {
 }
