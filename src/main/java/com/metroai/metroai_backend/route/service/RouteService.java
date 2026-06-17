@@ -43,11 +43,16 @@ public class RouteService {
 
         int totalStations = path.size() - 1;
 
-        double totalDistanceKm = totalStations * 5.0;
-
-        int estimatedTimeMinutes = totalStations * 2;
+        double totalDistanceKm =
+        calculateTotalDistance(
+                path
+        );
 
         int interchangeCount = calculateInterchanges(path );
+
+        int estimatedTimeMinutes = calculateTravelTime(totalDistanceKm,interchangeCount );
+
+        
 
         return new RouteResponse(
                 source.getId(),
@@ -140,6 +145,78 @@ private Long findCommonLine(
     }
 
     return null;
+}
+
+private double calculateDistanceBetweenStations(
+        Long stationA,
+        Long stationB
+) {
+
+    List<LineStation> first =
+            lineStationRepository
+                    .findByStationId(stationA);
+
+    List<LineStation> second =
+            lineStationRepository
+                    .findByStationId(stationB);
+
+    for (LineStation a : first) {
+
+        for (LineStation b : second) {
+
+            if (
+                    a.getLine().getId()
+                            .equals(
+                                    b.getLine().getId()
+                            )
+            ) {
+
+                return Math.abs(
+                        a.getDistanceFromStart()
+                                - b.getDistanceFromStart()
+                );
+            }
+        }
+    }
+
+    return 0.0;
+}
+
+private double calculateTotalDistance(
+        List<Long> path
+) {
+
+    double totalDistance = 0.0;
+
+    for (
+            int i = 0;
+            i < path.size() - 1;
+            i++
+    ) {
+
+        totalDistance +=
+                calculateDistanceBetweenStations(
+                        path.get(i),
+                        path.get(i + 1)
+                );
+    }
+
+    return Math.round(
+            totalDistance * 100.0
+    ) / 100.0;
+}
+
+private int calculateTravelTime(
+        double distanceKm,
+        int interchangeCount
+) {
+
+    double minutes =
+            (distanceKm / 35.0) * 60.0;
+
+    return (int) Math.ceil(
+            minutes
+    ) + (interchangeCount * 5);
 }
 
 }
