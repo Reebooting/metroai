@@ -1,6 +1,7 @@
 package com.metroai.metroai_backend.ticket.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,8 @@ public interface TicketRepository
     List<Ticket> findByUserId(
             UUID userId
     );
+
+    Optional<Ticket> findById(
+        Long id
+);
 }

@@ -12,7 +12,9 @@ public record TicketResponse(
 
         Double fare,
 
-        String status
+        String status,
+
+        String qrCode
 
 ) {
 }

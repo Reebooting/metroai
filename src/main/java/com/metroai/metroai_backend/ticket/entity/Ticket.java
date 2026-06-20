@@ -3,6 +3,7 @@ package com.metroai.metroai_backend.ticket.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,6 +39,9 @@ public class Ticket {
     private Long destinationStationId;
 
     private Double fare;
+
+    @Column(length = 500)
+    private String qrCode;
 
     @Enumerated(
             EnumType.STRING
