@@ -9,6 +9,6 @@ public class QrCodeUtil {
             Long ticketId
     ) {
 
-        return "METROAI-TICKET-" + ticketId;
+        return "TICKET-" + ticketId;
     }
 }

@@ -3,6 +3,8 @@ package com.metroai.metroai_backend.ticket.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,4 +72,29 @@ public TicketResponse cancelTicket(
     );
 }
 
+@PutMapping("/{ticketId}/validate")
+public TicketResponse validateTicket(
+        @PathVariable
+        Long ticketId
+) {
+
+    return ticketService.validateTicket(
+            ticketId
+    );
+}
+
+@GetMapping(
+        value = "/{ticketId}/qr",
+        produces = MediaType.IMAGE_PNG_VALUE
+)
+public ResponseEntity<byte[]> getQrCode(
+        @PathVariable Long ticketId
+) {
+
+    return ResponseEntity.ok(
+            ticketService.generateQrCode(
+                    ticketId
+            )
+    );
+}
 }

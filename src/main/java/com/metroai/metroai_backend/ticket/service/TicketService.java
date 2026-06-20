@@ -17,6 +17,7 @@ import com.metroai.metroai_backend.ticket.dto.TicketResponse;
 import com.metroai.metroai_backend.ticket.entity.Ticket;
 import com.metroai.metroai_backend.ticket.entity.TicketStatus;
 import com.metroai.metroai_backend.ticket.repository.TicketRepository;
+import com.metroai.metroai_backend.ticket.util.QrCodeGenerator;
 import com.metroai.metroai_backend.ticket.util.QrCodeUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -236,4 +237,104 @@ public TicketResponse cancelTicket(
     );
 }
 
+public TicketResponse validateTicket(
+        Long ticketId
+) {
+
+    Ticket ticket =
+            ticketRepository
+                    .findById(ticketId)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(
+                                    "Ticket not found"
+                            )
+                    );
+
+    if (
+            ticket.getStatus()
+                    == TicketStatus.CANCELLED
+    ) {
+
+        throw new IllegalStateException(
+                "Ticket is cancelled"
+        );
+    }
+
+    if (
+            ticket.getStatus()
+                    == TicketStatus.USED
+    ) {
+
+        throw new IllegalStateException(
+                "Ticket already used"
+        );
+    }
+
+    ticket.setStatus(
+            TicketStatus.USED
+    );
+
+    Ticket saved =
+            ticketRepository.save(ticket);
+
+    Station source =
+            stationRepository
+                    .findById(
+                            saved.getSourceStationId()
+                    )
+                    .orElseThrow();
+
+    Station destination =
+            stationRepository
+                    .findById(
+                            saved.getDestinationStationId()
+                    )
+                    .orElseThrow();
+
+    return new TicketResponse(
+            saved.getId(),
+            saved.getUserId(),
+            source.getName(),
+            destination.getName(),
+            saved.getFare(),
+            saved.getStatus().name(),
+            saved.getQrCode()
+    );
+}
+
+public byte[] generateQrCode(
+        Long ticketId
+) {
+
+    Ticket ticket =
+            ticketRepository
+                    .findById(ticketId)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(
+                                    "Ticket not found"
+                            )
+                    );
+
+    String qrContent =
+        ticket.getQrCode();
+
+if (qrContent == null) {
+
+    qrContent =
+            "METROAI-TICKET-"
+                    + ticket.getId();
+
+    ticket.setQrCode(
+            qrContent
+    );
+
+    ticketRepository.save(
+            ticket
+    );
+}
+
+    return QrCodeGenerator.generateQrCode(
+            qrContent
+    );
+}
 }
