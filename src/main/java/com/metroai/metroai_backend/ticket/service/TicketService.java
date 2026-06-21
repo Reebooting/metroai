@@ -207,24 +207,11 @@ public TicketResponse cancelTicket(
             TicketStatus.CANCELLED
     );
 
-    Ticket saved =
-            ticketRepository.save(
-                    ticket
-            );
+    Ticket saved =ticketRepository.save(ticket);
 
-    Station source =
-            stationRepository
-                    .findById(
-                            saved.getSourceStationId()
-                    )
-                    .orElseThrow();
+    Station source = stationRepository.findById(saved.getSourceStationId()).orElseThrow();
 
-    Station destination =
-            stationRepository
-                    .findById(
-                            saved.getDestinationStationId()
-                    )
-                    .orElseThrow();
+    Station destination = stationRepository.findById(saved.getDestinationStationId()).orElseThrow();
 
     return new TicketResponse(
             saved.getId(),
