@@ -307,8 +307,7 @@ public byte[] generateQrCode(
 ) {
 
     Ticket ticket =
-            ticketRepository
-                    .findById(ticketId)
+            ticketRepository.findById(ticketId)
                     .orElseThrow(
                             () -> new ResourceNotFoundException(
                                     "Ticket not found"
@@ -320,9 +319,7 @@ public byte[] generateQrCode(
 
 if (qrContent == null) {
 
-    qrContent =
-            "METROAI-TICKET-"
-                    + ticket.getId();
+    qrContent ="METROAI-TICKET-"+ ticket.getId();
 
     ticket.setQrCode(
             qrContent

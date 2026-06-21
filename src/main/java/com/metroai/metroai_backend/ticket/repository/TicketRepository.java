@@ -11,9 +11,7 @@ import com.metroai.metroai_backend.ticket.entity.Ticket;
 public interface TicketRepository
         extends JpaRepository<Ticket, Long> {
 
-    List<Ticket> findByUserId(
-            UUID userId
-    );
+    List<Ticket> findByUserId(UUID userId);
 
     Optional<Ticket> findById(
         Long id
