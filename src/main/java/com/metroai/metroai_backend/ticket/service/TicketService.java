@@ -163,19 +163,9 @@ public List<TicketResponse> getUserTickets(
             .stream()
             .map(ticket -> {
 
-                Station source =
-                        stationRepository
-                                .findById(
-                                        ticket.getSourceStationId()
-                                )
-                                .orElseThrow();
+                Station source =stationRepository.findById(ticket.getSourceStationId()).orElseThrow();
 
-                Station destination =
-                        stationRepository
-                                .findById(
-                                        ticket.getDestinationStationId()
-                                )
-                                .orElseThrow();
+                Station destination =stationRepository.findById(ticket.getDestinationStationId()).orElseThrow();
 
                 return new TicketResponse(
                         ticket.getId(),
@@ -194,9 +184,7 @@ public TicketResponse cancelTicket(
         Long ticketId
 ) {
 
-    Ticket ticket =
-            ticketRepository
-                    .findById(ticketId)
+    Ticket ticket = ticketRepository.findById(ticketId)
                     .orElseThrow(
                             () -> new ResourceNotFoundException(
                                     "Ticket not found"
