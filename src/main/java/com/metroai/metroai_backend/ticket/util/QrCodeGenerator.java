@@ -17,8 +17,7 @@ public class QrCodeGenerator {
 
         try {
 
-            QRCodeWriter qrCodeWriter =
-                    new QRCodeWriter();
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
             var bitMatrix =
                     qrCodeWriter.encode(
