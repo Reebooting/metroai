@@ -312,3 +312,247 @@ Stations:
 
 ```
 ```
+# MetroAI Project Progress (June 2026)
+
+## Project Overview
+
+MetroAI is a Delhi Metro-inspired intelligent transit system built using Spring Boot, PostgreSQL, Redis, Docker, JWT Authentication, Graph-Based Route Search, and AI integrations planned for future phases.
+
+---
+
+## Tech Stack
+
+### Backend
+
+* Java 21
+* Spring Boot 3
+* Spring Data JPA
+* Spring Security
+* JWT Authentication
+* PostgreSQL
+* Redis Cache
+* Docker
+* Maven
+
+### Future
+
+* React + TypeScript Frontend
+* AWS Deployment
+* AI Route Assistant
+* Kafka
+* Kubernetes
+
+---
+
+## Completed Features
+
+### Authentication
+
+* User Registration
+* User Login
+* BCrypt Password Encryption
+* JWT Token Generation
+* Role Enum (USER, ADMIN)
+* Protected APIs
+
+### Metro Network
+
+* Create Metro Lines
+* Create Stations
+* Assign Stations To Lines
+* LineStation Mapping
+* Interchange Support
+
+### Route Engine
+
+* Graph-Based BFS Route Search
+* Source To Destination Routing
+* Route Instructions
+* Route Segments
+* Distance Calculation
+* Estimated Travel Time
+* Interchange Detection
+* Fare Calculation
+
+### Ticketing
+
+* Ticket Booking
+* Ticket Entity
+* Ticket Status
+* Fare Storage
+* QR Code Generation
+* Ticket Retrieval API
+
+### Performance
+
+* Docker Installed
+* Ubuntu WSL2 Installed
+* Redis Installed
+* Redis Route Caching
+* Cached Route Responses
+* Reduced BFS Recalculation
+
+---
+
+## Infrastructure Completed
+
+### Docker
+
+* Docker Desktop Installed
+* Ubuntu WSL2 Configured
+* Redis Container Running
+
+### Redis
+
+* Spring Cache Enabled
+* Route Search Cached
+* Redis Connected Successfully
+
+---
+
+## APIs Completed
+
+### Auth
+
+POST /api/auth/register
+POST /api/auth/login
+
+### Lines
+
+POST /api/lines
+GET /api/lines
+
+### Stations
+
+POST /api/stations
+GET /api/stations
+GET /api/stations/{id}
+
+### Line Stations
+
+POST /api/line-stations
+
+### Routes
+
+GET /api/routes
+
+### Tickets
+
+POST /api/tickets
+GET /api/tickets/{id}
+
+---
+
+## Pending Backend Features
+
+### Security
+
+* Admin Authorization
+* Role Based Access Control
+
+### Journey Management
+
+* Journey History
+* User Journey Tracking
+
+### Ticket Validation
+
+* QR Scan Validation
+* Ticket Usage Tracking
+
+### Notifications
+
+* Kafka Integration
+
+---
+
+## Planned AI Features
+
+### AI Route Assistant
+
+User can ask:
+"How do I reach Rajiv Chowk before 8 PM?"
+
+AI generates:
+
+* Best Route
+* ETA
+* Interchanges
+* Fare
+
+### Natural Language Search
+
+Example:
+"Rajiv Chowk to Kashmere Gate"
+
+Converted automatically to route search.
+
+### Delay Prediction
+
+AI predicts route delays using historical data.
+
+### Metro Chatbot
+
+Answers:
+
+* Fare
+* Timings
+* Routes
+* Closest Station
+
+---
+
+## Planned Frontend
+
+React + TypeScript
+
+Pages:
+
+* Home
+* Search Route
+* Metro Map
+* Book Ticket
+* My Tickets
+* Journey History
+* Admin Dashboard
+* AI Assistant
+
+---
+
+## Planned AWS Deployment
+
+### EC2
+
+Spring Boot Hosting
+
+### RDS
+
+Managed PostgreSQL
+
+### ElastiCache
+
+Managed Redis
+
+### S3
+
+QR Codes
+Reports
+Metro Maps
+
+### CloudWatch
+
+Monitoring
+
+### Bedrock / OpenAI
+
+AI Features
+
+---
+
+## Current Status
+
+Project Completion:
+~70% Backend Complete
+
+Next Task:
+Admin Authorization & Role Based Access Control
