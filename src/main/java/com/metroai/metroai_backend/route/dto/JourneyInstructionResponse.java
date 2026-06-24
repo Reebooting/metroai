@@ -1,4 +1,5 @@
 package com.metroai.metroai_backend.route.dto;
+import java.io.Serializable;
 
 public record JourneyInstructionResponse(
 
@@ -6,5 +7,5 @@ public record JourneyInstructionResponse(
 
         String instruction
 
-) {
+) implements Serializable {
 }

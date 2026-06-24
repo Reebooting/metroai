@@ -3,6 +3,7 @@ package com.metroai.metroai_backend.route.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.metroai.metroai_backend.exception.ResourceNotFoundException;
@@ -25,10 +26,15 @@ public class RouteService {
     private final GraphService graphService;
     private final LineStationRepository lineStationRepository;
     private final StationRepository stationRepository;
+@Cacheable(
+        value = "routes",
+        key = "#sourceStationId + ':' + #destinationStationId"
+)
+
 
     public RouteResponse findRoute( Long sourceStationId,Long destinationStationId
     ) {
-
+        System.out.println("BFS EXECUTED");
         // BFS path
         List<Long> path = graphService.findShortestPath( sourceStationId, destinationStationId);
 

@@ -1,5 +1,6 @@
 package com.metroai.metroai_backend.route.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
 public record RouteResponse(
@@ -31,5 +32,5 @@ public record RouteResponse(
 
         
 
-) {
+) implements Serializable {
 }

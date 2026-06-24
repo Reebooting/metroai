@@ -1,4 +1,5 @@
 package com.metroai.metroai_backend.route.dto;
+import java.io.Serializable;
 
 public record RouteSegmentResponse(
 
@@ -10,5 +11,5 @@ public record RouteSegmentResponse(
 
         Integer stationCount
 
-) {
+) implements Serializable {
 }
