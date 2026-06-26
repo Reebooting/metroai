@@ -30,8 +30,7 @@ public String generateToken(
         String role
 ) {
 
-    return Jwts.builder()
-            .subject(email)
+    return Jwts.builder().subject(email)
             .claim("role", role)
             .issuedAt(new Date())
             .expiration(
