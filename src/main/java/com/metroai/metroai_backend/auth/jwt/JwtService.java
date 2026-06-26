@@ -38,8 +38,7 @@ public String generateToken(
                                     + jwtExpiration
                     )
             )
-            .signWith(getSigningKey())
-            .compact();
+            .signWith(getSigningKey()).compact();
 }
 
 
