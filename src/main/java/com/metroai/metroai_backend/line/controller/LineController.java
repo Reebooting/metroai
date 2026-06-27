@@ -1,5 +1,6 @@
 package com.metroai.metroai_backend.line.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ public class LineController {
 
     private final LineService lineService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public LineResponse createLine(
             @Valid @RequestBody

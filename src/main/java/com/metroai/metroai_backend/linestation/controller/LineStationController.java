@@ -2,6 +2,7 @@ package com.metroai.metroai_backend.linestation.controller;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,26 +24,21 @@ public class LineStationController {
 
     private final LineStationService lineStationService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public LineStationResponse createLineStation(
             @Valid @RequestBody
             CreateLineStationRequest request
     ) {
 
-        return lineStationService
-                .createLineStation(request);
+        return lineStationService.createLineStation(request);
     }
 
     @GetMapping("/line/{lineId}")
-    public List<LineStationResponse>
-    getStationsByLine(
-             @PathVariable Long lineId
-) {
+    public List<LineStationResponse> getStationsByLine(
+            @PathVariable Long lineId
+    ) {
 
-    return lineStationService
-            .getStationsByLine(
-                    lineId
-            );
-}
-
+        return lineStationService.getStationsByLine(lineId);
+    }
 }

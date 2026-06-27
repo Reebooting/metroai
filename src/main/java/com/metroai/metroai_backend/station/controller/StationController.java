@@ -3,19 +3,18 @@ package com.metroai.metroai_backend.station.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.metroai.metroai_backend.auth.service.AuthValidationService;
 import com.metroai.metroai_backend.station.dto.CreateStationRequest;
 import com.metroai.metroai_backend.station.dto.NearestStationResponse;
 import com.metroai.metroai_backend.station.dto.StationDetailsResponse;
@@ -31,120 +30,94 @@ import lombok.RequiredArgsConstructor;
 public class StationController {
 
     private final StationService stationService;
-    private final AuthValidationService authValidationService;
-    
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-public StationResponse createStation(
+    public StationResponse createStation(
+            @Valid @RequestBody
+            CreateStationRequest request
+    ) {
 
-        @RequestHeader("Authorization")
-        String authorizationHeader,
+        return stationService.createStation(
+                request
+        );
+    }
 
-        @Valid @RequestBody
-        CreateStationRequest request
-) {
+    @GetMapping
+    public List<StationResponse> getAllStations() {
 
-    String token =
-            authorizationHeader.replace(
-                    "Bearer ",
-                    ""
-            );
+        return stationService.getAllStations();
+    }
 
-    authValidationService.validateAdmin(
-            token
-    );
+    @GetMapping("/{id}")
+    public StationResponse getStationById(
+            @PathVariable Long id
+    ) {
 
-    return stationService.createStation(
-            request
-    );
-}
+        return stationService.getStationById(
+                id
+        );
+    }
 
-@GetMapping
-public List<StationResponse> getAllStations() {
+    @GetMapping("/nearest")
+    public NearestStationResponse nearestStation(
 
-    return stationService.getAllStations();
-}
+            @RequestParam Double latitude,
 
-@GetMapping("/{id}")
-public StationResponse getStationById(
-        @PathVariable Long id
-) {
+            @RequestParam Double longitude
 
-    return stationService.getStationById(
-            id
-    );
-}
-@GetMapping("/nearest")
-public NearestStationResponse nearestStation(
+    ) {
 
-        @RequestParam Double latitude,
+        return stationService.findNearestStation(
+                latitude,
+                longitude
+        );
+    }
 
-        @RequestParam Double longitude
+    @GetMapping("/search")
+    public List<StationResponse> searchStations(
+            @RequestParam String name
+    ) {
 
-) {
+        return stationService.searchStations(
+                name
+        );
+    }
 
-    return stationService.findNearestStation(
-            latitude,
-            longitude
-    );
-}
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public StationResponse updateStation(
+            @PathVariable Long id,
+            @Valid @RequestBody
+            CreateStationRequest request
+    ) {
 
-@GetMapping("/search")
-public List<StationResponse> searchStations(
-        @RequestParam String name
-) {
+        return stationService.updateStation(
+                id,
+                request
+        );
+    }
 
-    return stationService.searchStations(
-            name
-    );
-}
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteStation(
+            @PathVariable Long id
+    ) {
 
-@PutMapping("/{id}")
-public StationResponse updateStation(
+        stationService.deleteStation(
+                id
+        );
+    }
 
-        @RequestHeader("Authorization")
-        String authorizationHeader,
+    @GetMapping("/{id}/details")
+    public StationDetailsResponse getStationDetails(
+            @PathVariable Long id
+    ) {
 
-
-        @PathVariable Long id,
-        @Valid @RequestBody
-        CreateStationRequest request
-) {
-String token =
-            authorizationHeader.replace(
-                    "Bearer ",
-                    ""
-            );
-
-authValidationService.validateAdmin(token);
-
-
-    return stationService.updateStation(
-            id,
-            request
-    );
-}
-
-@DeleteMapping("/{id}")
-@ResponseStatus(HttpStatus.NO_CONTENT)
-public void deleteStation(
-        @RequestHeader("Authorization")
-        String authorizationHeader,@PathVariable Long id) {
-
-        String token =authorizationHeader.replace("Bearer ","");
-
-        authValidationService.validateAdmin(token);
-
-        stationService.deleteStation(id);
-}
-
-@GetMapping("/{id}/details")
-public StationDetailsResponse getStationDetails(
-        @PathVariable Long id
-) {
-
-    return stationService.getStationDetails(
-            id
-    );
-}
+        return stationService.getStationDetails(
+                id
+        );
+    }
 
 }
