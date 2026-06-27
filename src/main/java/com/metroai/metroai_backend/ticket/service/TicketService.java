@@ -4,8 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.metroai.metroai_backend.auth.entity.User;
 import com.metroai.metroai_backend.auth.repository.UserRepository;
 import com.metroai.metroai_backend.exception.ResourceNotFoundException;
 import com.metroai.metroai_backend.route.dto.RouteResponse;
@@ -13,6 +16,7 @@ import com.metroai.metroai_backend.route.service.RouteService;
 import com.metroai.metroai_backend.station.entity.Station;
 import com.metroai.metroai_backend.station.repository.StationRepository;
 import com.metroai.metroai_backend.ticket.dto.BookTicketRequest;
+import com.metroai.metroai_backend.ticket.dto.JourneyHistoryResponse;
 import com.metroai.metroai_backend.ticket.dto.TicketResponse;
 import com.metroai.metroai_backend.ticket.entity.Ticket;
 import com.metroai.metroai_backend.ticket.entity.TicketStatus;
@@ -30,16 +34,16 @@ public class TicketService {
     private final RouteService routeService;
     private final StationRepository stationRepository;
     private final UserRepository userRepository;
+    
     public TicketResponse bookTicket(
             BookTicketRequest request
     ) {
 
-userRepository.findById(request.userId())
-        .orElseThrow(
-                () -> new ResourceNotFoundException(
-                        "User not found"
-                )
-        );
+Authentication authentication =
+        SecurityContextHolder.getContext().getAuthentication();
+
+User currentUser =
+        (User) authentication.getPrincipal();
 
 
         RouteResponse route =
@@ -71,24 +75,14 @@ userRepository.findById(request.userId())
                         );
 
         Ticket ticket = Ticket.builder()
-                        .userId(
-                                request.userId()
+                        .userId(currentUser.getId()
                         )
-                        .sourceStationId(
-                                request.sourceStationId()
+                        .sourceStationId(request.sourceStationId())
+                        .destinationStationId(request.destinationStationId()
                         )
-                        .destinationStationId(
-                                request.destinationStationId()
-                        )
-                        .fare(
-                                route.fare().doubleValue()
-                        )
-                        .status(
-                                TicketStatus.BOOKED
-                        )
-                        .createdAt(
-                                LocalDateTime.now()
-                        )
+                        .fare(route.fare().doubleValue())
+                        .status(TicketStatus.BOOKED)
+                        .createdAt(LocalDateTime.now())
                         .build();
 
         Ticket savedTicket =
@@ -309,4 +303,47 @@ if (qrContent == null) {
             qrContent
     );
 }
+
+public List<JourneyHistoryResponse> getJourneyHistory() {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    User currentUser =
+            (User) authentication.getPrincipal();
+
+    return ticketRepository
+            .findByUserId(currentUser.getId())
+            .stream()
+            .map(ticket -> {
+
+                Station source =
+                        stationRepository
+                                .findById(ticket.getSourceStationId())
+                                .orElseThrow(() ->
+                                        new ResourceNotFoundException(
+                                                "Source station not found"
+                                        ));
+
+                Station destination =
+                        stationRepository
+                                .findById(ticket.getDestinationStationId())
+                                .orElseThrow(() ->
+                                        new ResourceNotFoundException(
+                                                "Destination station not found"
+                                        ));
+
+                return new JourneyHistoryResponse(
+                        ticket.getId(),
+                        ticket.getUserId(),
+                        source.getName(),
+                        destination.getName(),
+                        ticket.getFare(),
+                        ticket.getStatus().name(),
+                        ticket.getCreatedAt()
+                );
+            })
+            .toList();
+}
+
 }

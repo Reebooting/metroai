@@ -1,12 +1,8 @@
 package com.metroai.metroai_backend.ticket.dto;
 
-import java.util.UUID;
-
 import jakarta.validation.constraints.NotNull;
-public record BookTicketRequest(
 
-        @NotNull
-        UUID userId,
+public record BookTicketRequest(
 
         @NotNull
         Long sourceStationId,

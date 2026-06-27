@@ -1,7 +1,6 @@
 package com.metroai.metroai_backend.ticket.controller;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.metroai.metroai_backend.ticket.dto.BookTicketRequest;
+import com.metroai.metroai_backend.ticket.dto.JourneyHistoryResponse;
 import com.metroai.metroai_backend.ticket.dto.TicketResponse;
 import com.metroai.metroai_backend.ticket.service.TicketService;
 
@@ -34,67 +34,49 @@ public class TicketController {
             BookTicketRequest request
     ) {
 
-        return ticketService.bookTicket(
-                request
-        );
+        return ticketService.bookTicket(request);
     }
 
     @GetMapping("/{ticketId}")
-public TicketResponse getTicket(
-        @PathVariable
-        Long ticketId
-) {
+    public TicketResponse getTicket(
+            @PathVariable Long ticketId
+    ) {
 
-    return ticketService.getTicket(
-            ticketId
-    );
-}
+        return ticketService.getTicket(ticketId);
+    }
 
-@GetMapping("/user/{userId}")
-public List<TicketResponse> getUserTickets(
-        @PathVariable
-        UUID userId
-) {
+    @GetMapping("/history")
+    public List<JourneyHistoryResponse> getJourneyHistory() {
 
-    return ticketService.getUserTickets(
-            userId
-    );
-}
+        return ticketService.getJourneyHistory();
+    }
 
-@PutMapping("/{ticketId}/cancel")
-public TicketResponse cancelTicket(
-        @PathVariable
-        Long ticketId
-) {
+    @PutMapping("/{ticketId}/cancel")
+    public TicketResponse cancelTicket(
+            @PathVariable Long ticketId
+    ) {
 
-    return ticketService.cancelTicket(
-            ticketId
-    );
-}
+        return ticketService.cancelTicket(ticketId);
+    }
 
-@PutMapping("/{ticketId}/validate")
-public TicketResponse validateTicket(
-        @PathVariable
-        Long ticketId
-) {
+    @PutMapping("/{ticketId}/validate")
+    public TicketResponse validateTicket(
+            @PathVariable Long ticketId
+    ) {
 
-    return ticketService.validateTicket(
-            ticketId
-    );
-}
+        return ticketService.validateTicket(ticketId);
+    }
 
-@GetMapping(
-        value = "/{ticketId}/qr",
-        produces = MediaType.IMAGE_PNG_VALUE
-)
-public ResponseEntity<byte[]> getQrCode(
-        @PathVariable Long ticketId
-) {
+    @GetMapping(
+            value = "/{ticketId}/qr",
+            produces = MediaType.IMAGE_PNG_VALUE
+    )
+    public ResponseEntity<byte[]> getQrCode(
+            @PathVariable Long ticketId
+    ) {
 
-    return ResponseEntity.ok(
-            ticketService.generateQrCode(
-                    ticketId
-            )
-    );
-}
+        return ResponseEntity.ok(
+                ticketService.generateQrCode(ticketId)
+        );
+    }
 }
