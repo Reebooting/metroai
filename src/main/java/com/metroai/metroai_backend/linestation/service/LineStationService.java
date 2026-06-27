@@ -32,17 +32,17 @@ public class LineStationService {
 
         if (lineStationRepository
                 .existsByLineIdAndStationId(
-                     request.lineId(),
-                      request.stationId()
+                        request.lineId(),
+                        request.stationId()
                 )) {
-        
+
             throw new DuplicateResourceException(
-                   "Station already assigned to line"
+                    "Station already assigned to line"
             );
         }
 
-        Line line =
-                lineRepository
+        Line line
+                = lineRepository
                         .findById(request.lineId())
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(
@@ -50,8 +50,8 @@ public class LineStationService {
                                 )
                         );
 
-        Station station =
-                stationRepository
+        Station station
+                = stationRepository
                         .findById(request.stationId())
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(
@@ -59,8 +59,8 @@ public class LineStationService {
                                 )
                         );
 
-        LineStation lineStation =
-                LineStation.builder()
+        LineStation lineStation
+                = LineStation.builder()
                         .line(line)
                         .station(station)
                         .stationOrder(
@@ -72,8 +72,8 @@ public class LineStationService {
                         .createdAt(LocalDateTime.now())
                         .build();
 
-        LineStation saved =
-                lineStationRepository.save(
+        LineStation saved
+                = lineStationRepository.save(
                         lineStation
                 );
 
@@ -88,25 +88,25 @@ public class LineStationService {
         );
     }
 
-public List<LineStationResponse> getStationsByLine(
-        Long lineId
-) {
+    public List<LineStationResponse> getStationsByLine(
+            Long lineId
+    ) {
 
-    return lineStationRepository
-            .findByLineIdOrderByStationOrderAsc(
-                    lineId
-            )
-            .stream()
-            .map(lineStation -> new LineStationResponse(
-                    lineStation.getId(),
-                    lineStation.getLine().getId(),
-                    lineStation.getLine().getName(),
-                    lineStation.getStation().getId(),
-                    lineStation.getStation().getName(),
-                    lineStation.getStationOrder(),
-                    lineStation.getDistanceFromStart()
-            ))
-            .toList();
-}
+        return lineStationRepository
+                .findByLineIdOrderByStationOrderAsc(
+                        lineId
+                )
+                .stream()
+                .map(lineStation -> new LineStationResponse(
+                lineStation.getId(),
+                lineStation.getLine().getId(),
+                lineStation.getLine().getName(),
+                lineStation.getStation().getId(),
+                lineStation.getStation().getName(),
+                lineStation.getStationOrder(),
+                lineStation.getDistanceFromStart()
+        ))
+                .toList();
+    }
 
 }

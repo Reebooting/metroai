@@ -38,8 +38,8 @@ public class LineService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Line savedLine =
-                lineRepository.save(line);
+        Line savedLine
+                = lineRepository.save(line);
 
         return new LineResponse(
                 savedLine.getId(),

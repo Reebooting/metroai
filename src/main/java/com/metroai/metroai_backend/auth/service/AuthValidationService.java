@@ -20,20 +20,18 @@ public class AuthValidationService {
             String token
     ) {
 
-        String email =
-                jwtService.extractEmail(
+        String email
+                = jwtService.extractEmail(
                         token
                 );
 
-        User user =
-                userRepository
+        User user
+                = userRepository
                         .findByEmail(email)
                         .orElseThrow();
 
-        if (
-                user.getRole()
-                        != Role.ADMIN
-        ) {
+        if (user.getRole()
+                != Role.ADMIN) {
 
             throw new RuntimeException(
                     "Admin access required"

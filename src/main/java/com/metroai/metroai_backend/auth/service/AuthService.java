@@ -20,16 +20,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-  
-   public AuthService(
-        UserRepository userRepository,
-        PasswordEncoder passwordEncoder,
-        JwtService jwtService
-) {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
-    this.jwtService = jwtService;
-}
+
+    public AuthService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
+    ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+    }
 
     public String register(RegisterRequest request) {
 
@@ -53,53 +53,53 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
-    User user = userRepository
-            .findByEmail(request.email())
-            .orElseThrow(
-                    () -> new RuntimeException(
-                            "Invalid email or password"
-                    )
-            );
+        User user = userRepository
+                .findByEmail(request.email())
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Invalid email or password"
+                        )
+                );
 
-    boolean validPassword =
-            passwordEncoder.matches(
-                    request.password(),
-                    user.getPassword()
-            );
+        boolean validPassword
+                = passwordEncoder.matches(
+                        request.password(),
+                        user.getPassword()
+                );
 
-    if (!validPassword) {
-        throw new RuntimeException(
-                "Invalid email or password"
+        if (!validPassword) {
+            throw new RuntimeException(
+                    "Invalid email or password"
+            );
+        }
+
+        String token = jwtService.generateToken(
+                user.getEmail(),
+                user.getRole().name()
         );
+
+        return new LoginResponse(token);
     }
 
-    String token = jwtService.generateToken(
-        user.getEmail(),
-        user.getRole().name()
-);
+    public UserProfileResponse getCurrentUser(
+            String token
+    ) {
 
-return new LoginResponse(token);
-}
+        String email
+                = jwtService.extractEmail(token);
 
-public UserProfileResponse getCurrentUser(
-        String token
-) {
+        User user
+                = userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "User not found"
+                                )
+                        );
 
-    String email =
-            jwtService.extractEmail(token);
-
-    User user =
-            userRepository
-                    .findByEmail(email)
-                    .orElseThrow(
-                            () -> new RuntimeException(
-                                    "User not found"
-                            )
-                    );
-
-    return new UserProfileResponse(
-            user.getEmail(),
-            user.getRole().name()
-    );
-}
+        return new UserProfileResponse(
+                user.getEmail(),
+                user.getRole().name()
+        );
+    }
 }

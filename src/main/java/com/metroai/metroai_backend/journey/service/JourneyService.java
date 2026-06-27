@@ -24,8 +24,8 @@ public class JourneyService {
             Long destinationStationId
     ) {
 
-        LineStation source =
-                lineStationRepository
+        LineStation source
+                = lineStationRepository
                         .findByLineIdAndStationId(
                                 lineId,
                                 sourceStationId
@@ -36,8 +36,8 @@ public class JourneyService {
                                 )
                         );
 
-        LineStation destination =
-                lineStationRepository
+        LineStation destination
+                = lineStationRepository
                         .findByLineIdAndStationId(
                                 lineId,
                                 destinationStationId
@@ -48,130 +48,128 @@ public class JourneyService {
                                 )
                         );
 
-        int stationsBetween =
-                Math.abs(
+        int stationsBetween
+                = Math.abs(
                         destination.getStationOrder()
-                                - source.getStationOrder()
+                        - source.getStationOrder()
                 );
 
-        double distance =
-        Math.round(
-                Math.abs(
-                        destination.getDistanceFromStart()
+        double distance
+                = Math.round(
+                        Math.abs(
+                                destination.getDistanceFromStart()
                                 - source.getDistanceFromStart()
-                ) * 100.0
-        ) / 100.0;
+                        ) * 100.0
+                ) / 100.0;
 
-       return new JourneyResponse(
-        source.getStation().getName(),
-        destination.getStation().getName(),
-        stationsBetween,
-        distance,
-        stationsBetween * 2,
-        0,
-        List.of(
+        return new JourneyResponse(
                 source.getStation().getName(),
-                destination.getStation().getName()
-        )
-);
-    }
-
-public RouteResponse getRoute(
-        Long lineId,
-        Long sourceStationId,
-        Long destinationStationId
-) {
-
-    LineStation source =
-            lineStationRepository
-                    .findByLineIdAndStationId(
-                            lineId,
-                            sourceStationId
-                    )
-                    .orElseThrow(
-                            () -> new ResourceNotFoundException(
-                                    "Source station not found on line"
-                            )
-                    );
-
-    LineStation destination =
-            lineStationRepository
-                    .findByLineIdAndStationId(
-                            lineId,
-                            destinationStationId
-                    )
-                    .orElseThrow(
-                            () -> new ResourceNotFoundException(
-                                    "Destination station not found on line"
-                            )
-                    );
-
-    int sourceOrder = source.getStationOrder();
-    int destinationOrder = destination.getStationOrder();
-
-    int startOrder =
-            Math.min(
-                    sourceOrder,
-                    destinationOrder
-            );
-
-    int endOrder =
-            Math.max(
-                    sourceOrder,
-                    destinationOrder
-            );
-
-    List<LineStation> stations =
-            lineStationRepository
-                    .findByLineIdAndStationOrderBetweenOrderByStationOrderAsc(
-                            lineId,
-                            startOrder,
-                            endOrder
-                    );
-
-    List<String> route =
-            stations.stream()
-                    .map(ls ->
-                            ls.getStation()
-                                    .getName()
-                    )
-                    .toList();
-
-    if (sourceOrder > destinationOrder) {
-
-        route =
-                new java.util.ArrayList<>(
-                        route
-                );
-
-        java.util.Collections.reverse(
-                route
+                destination.getStation().getName(),
+                stationsBetween,
+                distance,
+                stationsBetween * 2,
+                0,
+                List.of(
+                        source.getStation().getName(),
+                        destination.getStation().getName()
+                )
         );
     }
 
-    int totalStations =
-            Math.abs(
-                    destinationOrder
-                            - sourceOrder
-            );
+    public RouteResponse getRoute(
+            Long lineId,
+            Long sourceStationId,
+            Long destinationStationId
+    ) {
 
-    double totalDistanceKm =
-            totalStations * 5.0;
+        LineStation source
+                = lineStationRepository
+                        .findByLineIdAndStationId(
+                                lineId,
+                                sourceStationId
+                        )
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Source station not found on line"
+                                )
+                        );
 
-    int estimatedTimeMinutes =
-            totalStations * 2;
+        LineStation destination
+                = lineStationRepository
+                        .findByLineIdAndStationId(
+                                lineId,
+                                destinationStationId
+                        )
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Destination station not found on line"
+                                )
+                        );
 
-    return new RouteResponse(
-            source.getStation().getName(),
-            destination.getStation().getName(),
-            totalStations,
-            totalDistanceKm,
-            estimatedTimeMinutes,
-            0,
+        int sourceOrder = source.getStationOrder();
+        int destinationOrder = destination.getStationOrder();
+
+        int startOrder
+                = Math.min(
+                        sourceOrder,
+                        destinationOrder
+                );
+
+        int endOrder
+                = Math.max(
+                        sourceOrder,
+                        destinationOrder
+                );
+
+        List<LineStation> stations
+                = lineStationRepository
+                        .findByLineIdAndStationOrderBetweenOrderByStationOrderAsc(
+                                lineId,
+                                startOrder,
+                                endOrder
+                        );
+
+        List<String> route
+                = stations.stream()
+                        .map(ls
+                                -> ls.getStation()
+                                .getName()
+                        )
+                        .toList();
+
+        if (sourceOrder > destinationOrder) {
+
             route
-    );
-}
+                    = new java.util.ArrayList<>(
+                            route
+                    );
 
+            java.util.Collections.reverse(
+                    route
+            );
+        }
 
+        int totalStations
+                = Math.abs(
+                        destinationOrder
+                        - sourceOrder
+                );
+
+        double totalDistanceKm
+                = totalStations * 5.0;
+
+        int estimatedTimeMinutes
+                = totalStations * 2;
+
+        return new RouteResponse(
+                source.getStation().getName(),
+                destination.getStation().getName(),
+                totalStations,
+                totalDistanceKm,
+                estimatedTimeMinutes,
+                0,
+                route
+        );
+    }
 
 }
