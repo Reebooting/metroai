@@ -14,12 +14,12 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException.class
     )
     public ResponseEntity<ErrorResponse>
-    handleResourceNotFound(
-            ResourceNotFoundException ex
-    ) {
+            handleResourceNotFound(
+                    ResourceNotFoundException ex
+            ) {
 
-        ErrorResponse response =
-                new ErrorResponse(
+        ErrorResponse response
+                = new ErrorResponse(
                         ex.getMessage(),
                         HttpStatus.NOT_FOUND.value(),
                         LocalDateTime.now()
@@ -34,12 +34,12 @@ public class GlobalExceptionHandler {
             DuplicateResourceException.class
     )
     public ResponseEntity<ErrorResponse>
-    handleDuplicateResource(
-            DuplicateResourceException ex
-    ) {
+            handleDuplicateResource(
+                    DuplicateResourceException ex
+            ) {
 
-        ErrorResponse response =
-                new ErrorResponse(
+        ErrorResponse response
+                = new ErrorResponse(
                         ex.getMessage(),
                         HttpStatus.CONFLICT.value(),
                         LocalDateTime.now()
